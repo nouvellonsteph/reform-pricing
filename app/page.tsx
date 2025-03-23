@@ -22,7 +22,7 @@ export default function Home() {
   const [occupancy, setOccupancy] = useState(80);
   const [teacherRate, setTeacherRate] = useState(35);
 
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState<{ occupancy: number; profit: number }[]>([]);
 
   useEffect(() => {
     const data = Array.from({ length: 11 }, (_, i) => {

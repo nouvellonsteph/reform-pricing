@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { DollarSign, Users, Bed, Clock, UserCog } from 'lucide-react';
+import { DollarSign, Users, Bed, Clock, UserCog, House, User, Dot, Shield, Wrench } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -35,8 +35,9 @@ export default function Home() {
       const studentsPerClass = (beds * currentOccupancy) / 100;
       const weeklyRevenue = classPrice * studentsPerClass * classesPerWeek;
       const weeklyTeacherCost = teacherRate * classesPerWeek;
-  const weeklyProfit = weeklyRevenue - weeklyTeacherCost - rent - frontDeskSalary - miscellaneousExpense - insurance - utilities;
-  const monthlyProfit = weeklyProfit * 4;
+      const weeklyProfit = weeklyRevenue - weeklyTeacherCost;
+      const monthlyCost = rent + frontDeskSalary + miscellaneousExpense + insurance + utilities;
+      const monthlyProfit = weeklyProfit * 4 - monthlyCost;
 
       return {
         occupancy: currentOccupancy,
@@ -45,14 +46,15 @@ export default function Home() {
     });
 
     setChartData(data);
-  }, [classPrice, classesPerWeek, beds, occupancy, teacherRate]);
+  }, [classPrice, classesPerWeek, beds, occupancy, teacherRate, rent, frontDeskSalary, miscellaneousExpense, insurance, utilities]);
 
   const calculateMetrics = () => {
     const studentsPerClass = (beds * occupancy) / 100;
     const weeklyRevenue = classPrice * studentsPerClass * classesPerWeek;
     const weeklyTeacherCost = teacherRate * classesPerWeek;
     const weeklyProfit = weeklyRevenue - weeklyTeacherCost;
-    const monthlyProfit = weeklyProfit * 4;
+    const monthlyCost = rent + frontDeskSalary + miscellaneousExpense + insurance + utilities;
+    const monthlyProfit = weeklyProfit * 4 - monthlyCost;
 
     return {
       studentsPerClass,
@@ -61,6 +63,7 @@ export default function Home() {
       weeklyProfit,
       monthlyRevenue: weeklyRevenue * 4,
       monthlyTeacherCost: weeklyTeacherCost * 4,
+      monthlyCost,
       monthlyProfit,
     };
   };
@@ -77,7 +80,7 @@ export default function Home() {
 
         <div className="grid gap-8 md:grid-cols-2">
           <Card className="p-6">
-            <h2 className="text-2xl font-light mb-6">Input Parameters</h2>
+            <h2 className="text-2xl font-light mb-6">Studio Configuration</h2>
             <div className="space-y-8">
               <div className="space-y-4">
                 <Label className="flex items-center gap-2">
@@ -173,6 +176,97 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+              <h2 className="text-2xl font-light mb-6">Monthly fixed costs</h2>
+              <div className="space-y-4">
+                <Label className="flex items-center gap-2">
+                  <House className="w-4 h-4" />
+                  Rent
+                </Label>
+                <div className="space-y-2">
+                  <Slider
+                    value={[rent]}
+                    onValueChange={(value) => setRent(value[0])}
+                    min={0}
+                    max={5000}
+                    step={50}
+                  />
+                  <p className="text-sm text-muted-foreground text-right">
+                    €{rent}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <Label className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Front Desk Salary
+                </Label>
+                <div className="space-y-2">
+                  <Slider
+                    value={[frontDeskSalary]}
+                    onValueChange={(value) => setFrontDeskSalary(value[0])}
+                    min={0}
+                    max={5000}
+                    step={50}
+                  />
+                  <p className="text-sm text-muted-foreground text-right">
+                    €{frontDeskSalary}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <Label className="flex items-center gap-2">
+                  <Dot className="w-4 h-4" />
+                  Miscellaneous Expense
+                </Label>
+                <div className="space-y-2">
+                  <Slider
+                    value={[miscellaneousExpense]}
+                    onValueChange={(value) => setMiscellaneousExpense(value[0])}
+                    min={0}
+                    max={1000}
+                    step={25}
+                  />
+                  <p className="text-sm text-muted-foreground text-right">
+                    €{miscellaneousExpense}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <Label className="flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Insurance
+                </Label>
+                <div className="space-y-2">
+                  <Slider
+                    value={[insurance]}
+                    onValueChange={(value) => setInsurance(value[0])}
+                    min={0}
+                    max={1000}
+                    step={25}
+                  />
+                  <p className="text-sm text-muted-foreground text-right">
+                    €{insurance}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <Label className="flex items-center gap-2">
+                  <Wrench className="w-4 h-4" />
+                  Utilities
+                </Label>
+                <div className="space-y-2">
+                  <Slider
+                    value={[utilities]}
+                    onValueChange={(value) => setUtilities(value[0])}
+                    min={0}
+                    max={1000}
+                    step={25}
+                  />
+                  <p className="text-sm text-muted-foreground text-right">
+                    €{utilities}
+                  </p>
+                </div>
+              </div>
             </div>
           </Card>
 
@@ -187,9 +281,9 @@ export default function Home() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Teacher Cost</p>
+                  <p className="text-sm text-muted-foreground">Monthly Costs</p>
                   <p className="text-2xl font-light">
-                    €{metrics.monthlyTeacherCost.toLocaleString()}
+                    €{metrics.monthlyCost.toLocaleString()}
                   </p>
                 </div>
                 <div>
@@ -244,53 +338,6 @@ export default function Home() {
                     />
                   </LineChart>
                 </ResponsiveContainer>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <h2 className="text-2xl font-light mb-6">Detailed Calculations</h2>
-              <div className="space-y-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Class Capacity</p>
-                  <div className="pl-4 space-y-1">
-                    <p>Total Beds: {beds}</p>
-                    <p>Occupancy Rate: {occupancy}%</p>
-                    <p>Students per Class: {metrics.studentsPerClass.toFixed(1)}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Weekly Revenue</p>
-                  <div className="pl-4 space-y-1">
-                    <p>Classes per Week: {classesPerWeek}</p>
-                    <p>Price per Class: €{classPrice}</p>
-                    <p>Students per Class: {metrics.studentsPerClass.toFixed(1)}</p>
-                    <p className="font-medium">Total: €{metrics.weeklyRevenue.toFixed(2)}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Weekly Costs</p>
-                  <div className="pl-4 space-y-1">
-                    <p>Teacher Rate: €{teacherRate}/hr</p>
-                    <p>Classes per Week: {classesPerWeek}</p>
-                    <p className="font-medium">Total: €{metrics.weeklyTeacherCost.toFixed(2)}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Weekly Profit</p>
-                  <div className="pl-4 space-y-1">
-                    <p>Revenue: €{metrics.weeklyRevenue.toFixed(2)}</p>
-                    <p>Costs: €{metrics.weeklyTeacherCost.toFixed(2)}</p>
-                    <p className="font-medium">Profit: €{metrics.weeklyProfit.toFixed(2)}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Monthly Totals (4 weeks)</p>
-                  <div className="pl-4 space-y-1">
-                    <p>Revenue: €{metrics.monthlyRevenue.toFixed(2)}</p>
-                    <p>Costs: €{metrics.monthlyTeacherCost.toFixed(2)}</p>
-                    <p className="font-medium">Profit: €{metrics.monthlyProfit.toFixed(2)}</p>
-                  </div>
-                </div>
               </div>
             </Card>
             

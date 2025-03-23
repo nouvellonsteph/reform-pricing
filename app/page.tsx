@@ -16,11 +16,16 @@ import {
 } from 'recharts';
 
 export default function Home() {
-  const [classPrice, setClassPrice] = useState(45);
+  const [classPrice, setClassPrice] = useState(35);
   const [classesPerWeek, setClassesPerWeek] = useState(30);
-  const [beds, setBeds] = useState(8);
-  const [occupancy, setOccupancy] = useState(80);
-  const [teacherRate, setTeacherRate] = useState(35);
+  const [beds, setBeds] = useState(6);
+  const [occupancy, setOccupancy] = useState(70);
+  const [teacherRate, setTeacherRate] = useState(40);
+  const [rent, setRent] = useState(2000);
+  const [frontDeskSalary, setFrontDeskSalary] = useState(2000);
+  const [miscellaneousExpense, setMiscellaneousExpense] = useState(500);
+  const [insurance, setInsurance] = useState(500);
+  const [utilities, setUtilities] = useState(400);
 
   const [chartData, setChartData] = useState<{ occupancy: number; profit: number }[]>([]);
 
@@ -30,8 +35,8 @@ export default function Home() {
       const studentsPerClass = (beds * currentOccupancy) / 100;
       const weeklyRevenue = classPrice * studentsPerClass * classesPerWeek;
       const weeklyTeacherCost = teacherRate * classesPerWeek;
-      const weeklyProfit = weeklyRevenue - weeklyTeacherCost;
-      const monthlyProfit = weeklyProfit * 4;
+  const weeklyProfit = weeklyRevenue - weeklyTeacherCost - rent - frontDeskSalary - miscellaneousExpense - insurance - utilities;
+  const monthlyProfit = weeklyProfit * 4;
 
       return {
         occupancy: currentOccupancy,

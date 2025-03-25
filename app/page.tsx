@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { DollarSign, Users, Bed, Clock, UserCog, House, User, Dot, Shield, Wrench, Star } from 'lucide-react';
+import { DollarSign, Users, Bed, Clock, UserCog, House, User, Dot, Shield, Wrench, Star, Coffee } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -27,6 +27,8 @@ export default function Home() {
   const [miscellaneousExpense, setMiscellaneousExpense] = useState(500);
   const [insurance, setInsurance] = useState(500);
   const [utilities, setUtilities] = useState(400);
+  const [shakePrice, setShakePrice] = useState(8);
+  const [shakeConversionRate, setShakeConversionRate] = useState(30);
 
   const [chartData, setChartData] = useState<{ occupancy: number; profit: number }[]>([]);
 
@@ -34,10 +36,12 @@ export default function Home() {
     const data = Array.from({ length: 11 }, (_, i) => {
       const currentOccupancy = i * 10;
       const studentsPerClass = (beds * currentOccupancy) / 100;
-      const weeklyRevenue = classPrice * studentsPerClass * classesPerWeek;
+      const weeklyClassRevenue = classPrice * studentsPerClass * classesPerWeek;
+      const weeklyShakeRevenue = shakePrice * studentsPerClass * classesPerWeek * (shakeConversionRate / 100);
+      const weeklyRevenue = weeklyClassRevenue + weeklyShakeRevenue;
       const weeklyTeacherCost = teacherRate * classesPerWeek;
       const weeklyProfit = weeklyRevenue - weeklyTeacherCost;
-      const transactionFees = weeklyRevenue * (transactionFee / 100) * 4;
+      const transactionFees = weeklyRevenue * (transactionFee / 100) * 4; // Apply transaction fees to all revenue
       const monthlyCost = rent + frontDeskSalary + miscellaneousExpense + insurance + utilities + transactionFees;
       const monthlyProfit = weeklyProfit * 4 - monthlyCost;
 
@@ -48,22 +52,35 @@ export default function Home() {
     });
 
     setChartData(data);
-  }, [classPrice, classesPerWeek, beds, occupancy, teacherRate, rent, frontDeskSalary, miscellaneousExpense, insurance, utilities]);
+  }, [classPrice, classesPerWeek, beds, occupancy, teacherRate, rent, frontDeskSalary, miscellaneousExpense, insurance, utilities, shakePrice, shakeConversionRate, transactionFee]);
 
   const calculateMetrics = () => {
     const studentsPerClass = (beds * occupancy) / 100;
-    const weeklyRevenue = classPrice * studentsPerClass * classesPerWeek;
+    const weeklyClassRevenue = classPrice * studentsPerClass * classesPerWeek;
+    const weeklyShakeRevenue = shakePrice * studentsPerClass * classesPerWeek * (shakeConversionRate / 100);
+    const weeklyRevenue = weeklyClassRevenue + weeklyShakeRevenue;
     const weeklyTeacherCost = teacherRate * classesPerWeek;
     const weeklyProfit = weeklyRevenue - weeklyTeacherCost;
-    const transactionFees = weeklyRevenue * (transactionFee / 100) * 4;
+    const transactionFees = weeklyRevenue * (transactionFee / 100) * 4; // Apply transaction fees to all revenue
     const monthlyCost = rent + frontDeskSalary + miscellaneousExpense + insurance + utilities + transactionFees;
     const monthlyProfit = weeklyProfit * 4 - monthlyCost;
+    
+    const monthlyClasses = classesPerWeek * 4;
+    const monthlyStudents = studentsPerClass * monthlyClasses;
+    const monthlyShakes = monthlyStudents * (shakeConversionRate / 100);
 
     return {
       studentsPerClass,
+      weeklyClassRevenue,
+      weeklyShakeRevenue,
       weeklyRevenue,
       weeklyTeacherCost,
       weeklyProfit,
+      monthlyClasses,
+      monthlyStudents,
+      monthlyShakes,
+      monthlyClassRevenue: weeklyClassRevenue * 4,
+      monthlyShakeRevenue: weeklyShakeRevenue * 4,
       monthlyRevenue: weeklyRevenue * 4,
       monthlyTeacherCost: weeklyTeacherCost * 4,
       monthlyCost,
@@ -179,7 +196,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              <h2 className="text-2xl font-light mb-6">Monthly fixed costs</h2>
+              <h2 className="text-2xl font-light mb-6">Monthly costs</h2>
               <div className="space-y-4">
                 <Label className="flex items-center gap-2">
                   <House className="w-4 h-4" />
@@ -288,6 +305,45 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+
+              <h2 className="text-2xl font-light mb-6 mt-8">Shake Sales</h2>
+              <div className="space-y-4">
+                <Label className="flex items-center gap-2">
+                  <Coffee className="w-4 h-4" />
+                  Shake Price
+                </Label>
+                <div className="space-y-2">
+                  <Slider
+                    value={[shakePrice]}
+                    onValueChange={(value) => setShakePrice(value[0])}
+                    min={4}
+                    max={15}
+                    step={0.5}
+                  />
+                  <p className="text-sm text-muted-foreground text-right">
+                    €{shakePrice}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <Label className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Shake Conversion Rate (%)
+                </Label>
+                <div className="space-y-2">
+                  <Slider
+                    value={[shakeConversionRate]}
+                    onValueChange={(value) => setShakeConversionRate(value[0])}
+                    min={0}
+                    max={100}
+                    step={5}
+                  />
+                  <p className="text-sm text-muted-foreground text-right">
+                    {shakeConversionRate}%
+                  </p>
+                </div>
+              </div>
             </div>
           </Card>
 
@@ -296,7 +352,37 @@ export default function Home() {
               <h2 className="text-2xl font-light mb-6">Monthly Projections</h2>
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Revenue</p>
+                  <p className="text-sm text-muted-foreground">Monthly Classes</p>
+                  <p className="text-2xl font-light">
+                    {metrics.monthlyClasses.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Monthly Students</p>
+                  <p className="text-2xl font-light">
+                    {Math.round(metrics.monthlyStudents).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Monthly Shakes Sold</p>
+                  <p className="text-2xl font-light">
+                    {Math.round(metrics.monthlyShakes).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Class Revenue</p>
+                  <p className="text-2xl font-light">
+                    €{metrics.monthlyClassRevenue.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Shake Revenue</p>
+                  <p className="text-2xl font-light">
+                    €{metrics.monthlyShakeRevenue.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Revenue</p>
                   <p className="text-2xl font-light">
                     €{metrics.monthlyRevenue.toLocaleString()}
                   </p>

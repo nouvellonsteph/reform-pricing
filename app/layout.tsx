@@ -1,17 +1,29 @@
+"use client";
 import './globals.css';
-import type { Metadata } from 'next';
+import { useState, useEffect } from 'react';
 import { Providers } from './providers';
-
-export const metadata: Metadata = {
-  title: 'Re.form | Pricing Simulator',
-  description: 'Reformer Pilates Studio Pricing Strategy Simulator',
-};
+import { metadata } from './metadata';
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [theme, setTheme] = useState<string>('light');
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    localStorage.setItem('theme', newTheme);
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -22,6 +34,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-background font-bodoni">
         <Providers>{children}</Providers>
+        <button onClick={toggleTheme} className="fixed top-4 right-4 p-2 bg-primary text-primary-foreground rounded-lg">
+          Switch to {theme === 'light' ? '☾' : '☼'}
+        </button>
       </body>
     </html>
   );

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { DollarSign, Users, Bed, Clock, UserCog, House, User, Dot, Shield, Wrench } from 'lucide-react';
+import { DollarSign, Users, Bed, Clock, UserCog, House, User, Dot, Shield, Wrench, Star } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -18,10 +18,10 @@ import {
 export default function Home() {
   const [classPrice, setClassPrice] = useState(35);
   const [classesPerWeek, setClassesPerWeek] = useState(30);
-  const [beds, setBeds] = useState(6);
+  const [beds, setBeds] = useState(8);
   const [occupancy, setOccupancy] = useState(70);
   const [teacherRate, setTeacherRate] = useState(40);
-  const [rent, setRent] = useState(2000);
+  const [rent, setRent] = useState(3000);
   const [transactionFee, setTransactionFee] = useState(3);
   const [frontDeskSalary, setFrontDeskSalary] = useState(2000);
   const [miscellaneousExpense, setMiscellaneousExpense] = useState(500);
@@ -218,7 +218,7 @@ export default function Home() {
               </div>
               <div className="space-y-4">
                 <Label className="flex items-center gap-2">
-                  <Dot className="w-4 h-4" />
+                  <Star className="w-4 h-4" />
                   Miscellaneous Expense
                 </Label>
                 <div className="space-y-2">
@@ -236,7 +236,7 @@ export default function Home() {
               </div>
               <div className="space-y-4">
                 <Label className="flex items-center gap-2">
-                  <Dot className="w-4 h-4" />
+                  <DollarSign className="w-4 h-4" />
                   Transaction Fees
                 </Label>
                 <div className="space-y-2">

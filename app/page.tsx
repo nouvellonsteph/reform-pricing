@@ -22,6 +22,7 @@ export default function Home() {
   const [occupancy, setOccupancy] = useState(70);
   const [teacherRate, setTeacherRate] = useState(40);
   const [rent, setRent] = useState(2000);
+  const [transactionFee, setTransactionFee] = useState(3);
   const [frontDeskSalary, setFrontDeskSalary] = useState(2000);
   const [miscellaneousExpense, setMiscellaneousExpense] = useState(500);
   const [insurance, setInsurance] = useState(500);
@@ -36,7 +37,8 @@ export default function Home() {
       const weeklyRevenue = classPrice * studentsPerClass * classesPerWeek;
       const weeklyTeacherCost = teacherRate * classesPerWeek;
       const weeklyProfit = weeklyRevenue - weeklyTeacherCost;
-      const monthlyCost = rent + frontDeskSalary + miscellaneousExpense + insurance + utilities;
+      const transactionFees = weeklyRevenue * (transactionFee / 100) * 4;
+      const monthlyCost = rent + frontDeskSalary + miscellaneousExpense + insurance + utilities + transactionFees;
       const monthlyProfit = weeklyProfit * 4 - monthlyCost;
 
       return {
@@ -53,7 +55,8 @@ export default function Home() {
     const weeklyRevenue = classPrice * studentsPerClass * classesPerWeek;
     const weeklyTeacherCost = teacherRate * classesPerWeek;
     const weeklyProfit = weeklyRevenue - weeklyTeacherCost;
-    const monthlyCost = rent + frontDeskSalary + miscellaneousExpense + insurance + utilities;
+    const transactionFees = weeklyRevenue * (transactionFee / 100) * 4;
+    const monthlyCost = rent + frontDeskSalary + miscellaneousExpense + insurance + utilities + transactionFees;
     const monthlyProfit = weeklyProfit * 4 - monthlyCost;
 
     return {
@@ -223,11 +226,29 @@ export default function Home() {
                     value={[miscellaneousExpense]}
                     onValueChange={(value) => setMiscellaneousExpense(value[0])}
                     min={0}
-                    max={1000}
-                    step={25}
+                    max={2000}
+                    step={100}
                   />
                   <p className="text-sm text-muted-foreground text-right">
                     €{miscellaneousExpense}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <Label className="flex items-center gap-2">
+                  <Dot className="w-4 h-4" />
+                  Transaction Fees
+                </Label>
+                <div className="space-y-2">
+                  <Slider
+                    value={[transactionFee]}
+                    onValueChange={(value) => setTransactionFee(value[0])}
+                    min={0}
+                    max={100}
+                    step={1}
+                  />
+                  <p className="text-sm text-muted-foreground text-right">
+                    {transactionFee}% of revenue
                   </p>
                 </div>
               </div>
@@ -345,5 +366,4 @@ export default function Home() {
         </div>
       </div>
     </main>
-  );
-}
+  )};
